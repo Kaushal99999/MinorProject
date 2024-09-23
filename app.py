@@ -20,7 +20,9 @@ def scale(X):
 def predict(model, input_data):
     scaled_data = scale(input_data)
     prediction = model.predict(scaled_data)
-    return prediction[0]
+    prob=model.predict_proba(scaled_data)
+    Failure,Success=round(prob[0][0]*100,2),round(prob[0][1]*100,2)
+    return (prediction[0],max(Failure,Success))
 
 # Streamlit app main function
 def main():
@@ -52,10 +54,10 @@ def main():
     # Predict button
     if st.button('Predict'):
         prediction = predict(model,  input_data)
-        if prediction == 1:
-            st.success("The model predicts that you are **at risk** of heart disease.")
+        if prediction[0] == 1:
+            st.success(f"The model predicts that you are **at risk** of heart disease with a probability of {prediction[1]} %.")
         else:
-            st.success("The model predicts that you are **not at risk** of heart disease.")
+            st.success(f"The model predicts that you are **not at risk** of heart disease with a probability of {prediction[1]} %.")
 
 # Run the Streamlit app
 if __name__ == '__main__':
