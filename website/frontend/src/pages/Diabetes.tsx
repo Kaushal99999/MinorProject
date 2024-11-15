@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import BarChart from "../components/BarChart";
+// import BarChart from "../components/BarChart";
 import TextInput from "../components/TextInput";
 
 interface IFormData {
@@ -16,7 +16,7 @@ interface IFormData {
 interface IPrediction {
   prediction: number;
   probability: number;
-  shapValues: number[][];
+  // shapValues: number[][] | null;
 }
 
 const Diabetes = () => {
@@ -60,7 +60,7 @@ const Diabetes = () => {
 
       const result = await response.json();
       console.log(result);
-      // setPredictionResult(result);
+      setPredictionResult(result);
       setErrorMessage("");
     } catch (error) {
       console.log(error);
@@ -69,14 +69,14 @@ const Diabetes = () => {
   };
 
   return (
-    <div className="flex flex-col w-full h-screen max-w-screen-md p-4 pb-10 m-10 mx-auto text-black border border-gray-300 rounded-md">
+    <div className="flex flex-col w-full h-screen max-w-screen-md p-4 m-10 mx-auto text-black border border-gray-300 rounded-md">
       <h2 className="mb-4 text-xl font-semibold text-center">
         Diabetes Prediction
       </h2>
       <div className="w-full p-6 bg-white">
         <form
           onSubmit={handleSubmit}
-          className="grid grid-cols-2 gap-6 p-6justify-items-center"
+          className="grid grid-cols-2 gap-6 p-6 justify-items-center"
         >
           <TextInput
             name="Pregnancies"
@@ -150,17 +150,17 @@ const Diabetes = () => {
       </div>
       <div className="flex flex-col items-center w-full p-6 text-center min-h-96">
         <div className="relative flex flex-col items-center justify-center w-full p-6 text-center h-80">
-          <div
+          {/* <div
             className={`absolute z-0 w-1/2 aspect-square flex flex-col items-center justify-center transition-all animate-beat duration-500
                 ${
                   predictionResult === null
                     ? "bg-[radial-gradient(50%_50%_at_50%_50%,rgba(0,0,0,0.30)_0%,rgba(255,255,255,0.00)_100%)]"
-                    : predictionResult.prediction === 1
+                    : predictionResult.prediction === 0
                     ? "bg-[radial-gradient(50%_50%_at_50%_50%,rgba(0,255,0,0.30)_0%,rgba(255,255,255,0.00)_100%)]"
                     : "bg-[radial-gradient(50%_50%_at_50%_50%,rgba(255,0,0,0.30)_0%,rgba(255,255,255,0.00)_100%)]"
                 }
                 `}
-          ></div>
+          ></div> */}
           <div className="z-10 flex flex-col items-center justify-center gap-2">
             <h3 className="text-lg font-semibold">Prediction Result</h3>
             {predictionResult === null ? (
@@ -170,12 +170,12 @@ const Diabetes = () => {
                 <p
                   className={`text-gray-700 text-2xl font-bold
                   ${
-                    predictionResult.prediction === 1
+                    predictionResult.prediction === 0
                       ? "text-green-500"
                       : "text-red-500"
                   }`}
                 >
-                  {predictionResult.prediction === 1
+                  {predictionResult.prediction === 0
                     ? "No heart disease detected."
                     : "Heart disease detected."}
                 </p>
@@ -189,9 +189,9 @@ const Diabetes = () => {
             )}
           </div>
         </div>
-        {predictionResult !== null && (
+        {/* {predictionResult && predictionResult.shapValues !== null && (
           <BarChart shapValues={predictionResult.shapValues[0]} />
-        )}
+        )} */}
       </div>
     </div>
   );

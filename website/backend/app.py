@@ -5,6 +5,10 @@ import pandas as pd
 from sklearn.preprocessing import MinMaxScaler, scale
 import shap
 import tensorflow as tf
+import joblib
+
+# Load the scaler
+diabetes_scaler = joblib.load('../../Diabetes/scaler.joblib')
 
 # scaler = MinMaxScaler()
 # def scale(X):
@@ -23,6 +27,7 @@ diabetes_model = tf.keras.models.load_model('../../Diabetes/my_model.keras')
 
 
 explainer = shap.Explainer(heart_model)
+# diabetes_explainer = shap.DeepExplainer(diabetes_model)
     
 @app.route('/predict_heart', methods=['POST'])
 def predict_heart():
@@ -56,7 +61,11 @@ def predict_heart():
     # print("Shap:", shap_values.values.tolist())
 
     # Return the result as a JSON response
-    return jsonify({'prediction': int(prediction[0]), 'probability': float(prob[0][prediction[0]]), 'shapValues': shap_values.values.tolist()  }), 200, {'Content-Type': 'application/json; charset=utf-8'}
+    return jsonify({
+        'prediction': int(prediction[0]), 
+        'probability': float(prob[0][prediction[0]]), 
+        'shapValues': shap_values.values.tolist()  
+    }), 200, {'Content-Type': 'application/json; charset=utf-8'}
 
 @app.route('/predict_diabetes', methods=['POST'])
 def predict_diabetes():
@@ -69,18 +78,25 @@ def predict_diabetes():
     values = [float(data[feature]) for feature in diabetes_features]
     input_data = pd.DataFrame([values], columns=diabetes_features)
 
-    scaled_input = scale(input_data.values)
+    scaled_input = diabetes_scaler.transform(input_data.values)
     
     print(scaled_input)
     
     # Model expects input as a NumPy array
     prediction = diabetes_model.predict(scaled_input)
-    diabetes_risk = prediction[0][0]  # assuming the model outputs a probability
+    class_probabilities = prediction[0]  # Extract the probabilities for the classes
+    predicted_class = int(class_probabilities.argmax())  # Get the class with the highest probability
+    predicted_probability = float(class_probabilities[predicted_class])  # Probability of the predicted class
+
+    # shap_values = diabetes_explainer(scaled_input)
+
 
     print(prediction)
 
     return jsonify({
-        'diabetes_risk': float(diabetes_risk)
+        'prediction': predicted_class,
+        'probability': predicted_probability,
+        # 'shapValues': shap_values.values.tolist()
     }), 200
 
 if __name__ == '__main__':
